@@ -1,0 +1,13 @@
+gestion des M_OPT
+replace printfs
+rename functions malloc__
+
+reread realloc
+
+tests threads
+
+errno
+
+reclimb from delete_chain_cell to protecc EVERY POSSIBLE variable
+
+REDO SHOW ALLOC MEM: ALL BUGGYYYY

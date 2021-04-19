@@ -1,0 +1,4 @@
+LD_LIBRARY_PATH="." LD_PRELOAD="/home/alikae/malloc2.0/libmalloc.so"
+
+gdb:
+set exec-wrapper env 'LD_PRELOAD=/home/alikae/malloc2.0/libmalloc.so'
