@@ -1,15 +1,21 @@
+// OK!
+
 #include "malloc.h"
 
-// DO WE NEED TO ALIGN?
 void    *ft_calloc(size_t nmemb, size_t size)
 {
     void    *ptr;
+    size_t  i;
 
-    if (nmemb && (size_t)-1 / nmemb <= size)
+	size = align(size ? size : 1, MEM_ALIGNMENT);
+    if ((size_t)-1 / size <= nmemb)
         return (set_error(M_E_ARGS_TOO_LARGE));
     size *= nmemb;
     if ((ptr = ft_malloc(size)))
-        for (size_t i = 0; i < size / sizeof(void*); i++)
+    {
+        i = -1;
+        while (++i < size / sizeof(void*))
             ((void**)ptr)[i] = 0;
+    }
     return (ptr);
 }

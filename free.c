@@ -1,3 +1,4 @@
+// OK!
 #include "malloc.h"
 
 void	free_and_merge_cell(t_chain *chain, t_chaincell *cell, uint8_t zone)
@@ -32,8 +33,6 @@ void	ft_free(void *ptr)
 	t_chaincell	*cell;
     t_chain     *chain;
 
-    // Useless ?
-	malloc_data();
 	if (!ptr)
 		return ;
 	zone = -1;

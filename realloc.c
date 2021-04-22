@@ -1,3 +1,4 @@
+// OK! Just check comments
 #include "malloc.h"
 
 t_chaincell *cut_and_merge_cell(t_chain *chain, t_chaincell *cell, size_t size)
@@ -34,13 +35,12 @@ size_t      min(size_t a, size_t b)
 
 void	    *ft_realloc(void *ptr, size_t size)
 {
-    // reread carefully
+    // reread carefully one last time !!! Was buggy !!! think about all zones !!!
 	t_chaincell	*cell;
 	void		*p;
     size_t      size_to_copy;
     uint8_t     cell_found;
 
-	malloc_data();
     if (!size)
     {
         ft_free(ptr);
@@ -57,8 +57,9 @@ void	    *ft_realloc(void *ptr, size_t size)
             size_to_copy = cell->size;
             if (malloc_params()->max_accepted_size[zone] < size)
             {
+                // HANDLE BIG BLOCK
                 p = ft_malloc(size);
-                ft_memcpy(p, ptr, size_to_copy);
+                ft_memcpy(p, ptr, min(size_to_copy, size));
                 ft_free(ptr);
                 return (p);
             }
@@ -66,7 +67,7 @@ void	    *ft_realloc(void *ptr, size_t size)
 			break;
 		}
 	}
-	if (!cell || cell->is_free /* Useless is_free ? */)
+	if (!cell || cell->is_free)
 	{
 		p = ft_malloc(size);
 		if (cell_found)

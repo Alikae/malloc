@@ -1,13 +1,20 @@
 gestion des M_OPT
-replace printfs
 rename functions malloc__
-
-reread realloc
 
 tests threads
 
-errno
-
 reclimb from delete_chain_cell to protecc EVERY POSSIBLE variable
 
-REDO SHOW ALLOC MEM: ALL BUGGYYYY
+
+test options
+
+
+if arena alloc but metadata fail, arena is not referenced anywhere!!
+
+    add mutex to printers
+
+Add read_env to malloc init to set options
+
+strange diff between:
+     LD_LIBRARY_PATH="." LD_PRELOAD="/home/alikae/malloc2.0/libmalloc.so" time vim
+time LD_LIBRARY_PATH="." LD_PRELOAD="/home/alikae/malloc2.0/libmalloc.so"      vim

@@ -1,3 +1,4 @@
+// OK!
 #include "malloc.h"
 #include "errno.h"
 
@@ -41,5 +42,5 @@ const char	*get_error()
 		return ("M_E_INVALID_FREE (potential DOUBLE_FREE)");
 	else if (error == M_E_ARGS_TOO_LARGE)
 		return ("M_E_ARGS_TOO_LARGE (type overflow)");
-	return ("Undefined Error");
+	return ("Undefined Error: Corrupted malloc data");
 }

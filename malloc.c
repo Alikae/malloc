@@ -1,3 +1,4 @@
+// OK !
 #include "malloc.h"
 
 uint8_t		cut_cell(t_chain *chain, t_chaincell *cell, size_t size)
@@ -9,13 +10,13 @@ uint8_t		cut_cell(t_chain *chain, t_chaincell *cell, size_t size)
 	newcell.next = cell->next;
 	newcell.size = cell->size - size;
 	newcell.is_free = 1;
-	cell->size = size;
 	if (!add_cell(chain, &newcell))
         return (0);
+	cell->size = size;
 	return (1);
 }
 
-t_chaincell	*first_fit(uint8_t zone, size_t size)
+t_chaincell	*first_fit_backward(uint8_t zone, size_t size)
 {
 	t_chain		*mem_as_chain;
 	t_chaincell	*cell;
@@ -24,7 +25,7 @@ t_chaincell	*first_fit(uint8_t zone, size_t size)
 	cell = &mem_as_chain->cells[0];
     // instead of search by next, search by [i] for speed and concision
     // make it another test algo
-    // another searching backward to optimize the loop {malloc/free}
+    // this one search backward to optimize huge use of malloc without free
 	while (cell)
 	{
 		if (cell->size >= size && cell->is_free)
@@ -41,7 +42,30 @@ t_chaincell	*first_fit(uint8_t zone, size_t size)
 	return (0);
 }
 
-void	*find_free_space(uint8_t zone, size_t size)
+t_chaincell	*first_fit(uint8_t zone, size_t size)
+{
+	t_chain		*mem_as_chain;
+	t_chaincell	*cell;
+
+	mem_as_chain = malloc_data()->mem_as_chain[zone];
+	cell = &mem_as_chain->cells[0];
+	while (cell)
+	{
+		if (cell->size >= size && cell->is_free)
+		{
+			if (cell->size > size && !cut_cell(mem_as_chain, cell, size))
+				return (0);
+			cell->is_free = 0;
+			return (cell);
+		}
+		cell = cell->next;
+		if (cell == &mem_as_chain->cells[0])
+			return (0);
+	}
+	return (0);
+}
+
+static void *find_free_space(uint8_t zone, size_t size)
 {
 	t_chaincell	*cell;
 
@@ -53,7 +77,8 @@ void	*find_free_space(uint8_t zone, size_t size)
 			return (0);
 		cell->is_free = 0;
 		 if (cell->size > size)
-			cut_cell(malloc_data()->mem_as_chain[zone], cell, size);
+			if (!cut_cell(malloc_data()->mem_as_chain[zone], cell, size))
+                return (0);
 	}
 	return (cell->block);
 }
@@ -74,7 +99,6 @@ void	*ft_malloc(size_t size)
 	uint8_t	zone;
 	void	*mem;
 
-	malloc_data();
 	size = align(size ? size : 1, MEM_ALIGNMENT);
 	zone = dispatch_zone(size);
 	mem = find_free_space(zone, size);

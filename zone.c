@@ -1,11 +1,12 @@
+// OK! Just check comments
 #include "malloc.h"
 
 /*
     A Zone is as following:
     [user_size][alignment]
      ^         ^- Necessary to be sure that two different user-zones cannot be contiguous on memory,
-     |              that would fuck up the free system
-     L__ define in malloc_params for all but large, large depend on the block itself
+     |                that would fuck up the free system
+     L___________ Define in malloc_params for all but large, large depend on the block itself
 */
 
 size_t		align(size_t to_align, size_t alignment)
@@ -63,6 +64,7 @@ static t_chaincell *create_subzone(t_chain *chain, uint8_t zone, size_t size)
 	}
 	if (!(cell = add_cell(chain, &zone_as_chain)))
 		return (0);
+        // also munmap the arena?
 	return (find_cell_by_block(chain, subzone));
 }
 
@@ -76,5 +78,7 @@ t_chaincell	*alloc_new_subzone(uint8_t zone, size_t size)
 
 void	free_subzone(void *to_free, uint8_t zone, size_t size)
 {
+// OPTIONNALY
+    optiwrite(1, "\033[2J", 4, 0);
 	munmap(to_free, subzone_real_size(zone, size));
 }

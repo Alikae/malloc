@@ -7,6 +7,7 @@ SRC	=	chain.c \
 		zone.c \
 		realloc.c \
         calloc.c \
+        options.c \
 
 CC	=	gcc
 
@@ -43,4 +44,4 @@ ll2:
 	$(CC) $(FLAGS) $(SRC) ll2.c
 
 lib:
-	$(CC) -fpic -shared -o libmalloc.so $(FLAGS) $(SRC) cascouy.c
+	$(CC) -fpic -shared -o libmalloc.so $(FLAGS) $(SRC) wrappers.c
