@@ -10,12 +10,22 @@ typedef struct s_subzone
 	uint8_t			mem;
 }		t_subzone;
 
+typedef struct  s_malloc_stats
+{
+    size_t  malloc_calls;
+    size_t  realloc_calls;
+    size_t  calloc_calls;
+    size_t  free_calls;
+    size_t  total_calls;
+}               t_malloc_stats;
+
 typedef struct	s_malloc
 {
 	t_chain		        *mem_as_chain[NB_ZONES];
 	uint8_t		        init;
     pthread_mutex_t     mutex;
 	t_malloc_error		error;
+    t_malloc_stats      stats;
 }		t_malloc;
 
 void	        *malloc(size_t size);
@@ -26,6 +36,7 @@ void            show_alloc_mem();
 
 // Algos
 t_chaincell	    *first_fit(uint8_t zone, size_t size);
+t_chaincell	    *first_fit_backward(uint8_t zone, size_t size);
 
 // Debug
 void            set_malloc_options(t_malloc_option opt);

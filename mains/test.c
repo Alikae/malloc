@@ -16,7 +16,7 @@
 #include <time.h>
 
 #define SIZE_TAB	50
-#define NB_TEST		1000000
+#define NB_TEST		100000
 #define SIZE_ALLOC	16
 
 int		size_tab[SIZE_TAB];
@@ -64,7 +64,7 @@ int8_t		unit_test(char **tab, int index)
 	r = rand() % SIZE_TAB;
 	(void)index;
 	test_read2(tab[r], secure_align_size(size_tab[r]));
-	ft_free(tab[r]);
+	free(tab[r]);
 	size_tab[r] = get_size_alloc();
 	if (!(tab[r] = malloc(size_tab[r])))
 		return (ERROR);
@@ -102,11 +102,11 @@ void		finish(char **tab)
 	while (i < SIZE_TAB)
 	{
 		write(1, "o", 1);
-		ft_free(tab[i]);
+		free(tab[i]);
 		i++;
 	}
 	write(1, "e", 1);
-	ft_free(tab);
+	free(tab);
 }
 
 int			main(int ac, char **av)
@@ -129,10 +129,11 @@ int			main(int ac, char **av)
 	write(1, "\n", 1);
 	i = -1;
 	// while (++i < NB_TEST)
+    write(1, "HERE'S NOW!!!!!!!!!!\n", 20);
 	while (++i < nb_tests)
 	{
-		// write(1, "?", 1);
-		if (0 == i % 1000)
+		 //write(1, "?", 1);
+		if (0 == i % 100)
 			printf("%d\n", i);
 		if (ERROR == unit_test(tab, i))
 			return (10);

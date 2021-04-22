@@ -47,6 +47,9 @@ static t_chaincell *create_subzone(t_chain *chain, uint8_t zone, size_t size)
 	t_chaincell		zone_as_chain;
 	t_chaincell		*cell;
 
+// OPTIONNALY
+    if (malloc_params()->options & MOPT_PRINT_META && zone != NB_ZONES - 1)
+            optiwrite(1, "\033[2J", 4, 0);
 	if (!(subzone = alloc(subzone_real_size(zone, size))))
 		return (0);
 	zone_as_chain.block = subzone;
@@ -79,6 +82,7 @@ t_chaincell	*alloc_new_subzone(uint8_t zone, size_t size)
 void	free_subzone(void *to_free, uint8_t zone, size_t size)
 {
 // OPTIONNALY
-    optiwrite(1, "\033[2J", 4, 0);
+    if (malloc_params()->options & MOPT_PRINT_META && zone != NB_ZONES - 1)
+        optiwrite(1, "\033[2J", 4, 0);
 	munmap(to_free, subzone_real_size(zone, size));
 }

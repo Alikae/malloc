@@ -6,8 +6,6 @@ void	*alloc(size_t size)
 {
 	void	*mem;
 
-// OPTIONNALY
-    optiwrite(1, "\033[2J", 4, 0);
     size = align(size, malloc_params()->page_size);
 	if ((mem = mmap(0, size,
 				PROT_READ | PROT_WRITE,
@@ -79,8 +77,6 @@ void	remove_cell(t_chain *chain, t_chaincell *cell)
 		cell->next->prev = cell;
 	if (chain->index < MALLOC_CHAIN_SIZE / 2 && chain->next)
 	{
-// OPTIONNALY
-    optiwrite(1, "\033[2J", 4, 0);
 		munmap(chain->next, align(sizeof(t_chain), malloc_params()->page_size));
 		chain->next = 0;
 	}

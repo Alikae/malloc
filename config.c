@@ -35,6 +35,10 @@ static void set_env_options()
         options |= MOPT_SLEEP;
     if (getenv("MOPT_PRINT_NO_LARGE"))
         options |= MOPT_PRINT_NO_LARGE;
+    if (getenv("MOPT_PRINT_ONLY_TINY"))
+        options |= MOPT_PRINT_ONLY_TINY;
+    if (getenv("MOPT_PRINT_STEP"))
+        options |= MOPT_PRINT_STEP;
     set_malloc_options(options);
 }
 
@@ -46,6 +50,7 @@ t_malloc_params	*malloc_params()
 		first_fit_backward,
         MOPT_PRINT_ERROR
         ,
+        1000,
 		0
 	};
 	return (&params);

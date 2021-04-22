@@ -27,6 +27,21 @@ void    optiwrite(int fd, const char *s, size_t size, uint8_t flush)
         optiflush(fd, buffer, &i);
 }
 
+void    print_malloc_stats()
+{
+	optiwrite(1, "mallocs: ", 9, 0);
+    print_size(malloc_data()->stats.malloc_calls);
+	optiwrite(1, ", callocs: ", 11, 0);
+    print_size(malloc_data()->stats.calloc_calls);
+	optiwrite(1, ", reallocs: ", 12, 0);
+    print_size(malloc_data()->stats.realloc_calls);
+	optiwrite(1, ", frees: ", 9, 0);
+    print_size(malloc_data()->stats.free_calls);
+//	optiwrite(1, ", Total: ", 9, 0);
+//    print_size(malloc_data()->stats.total_calls);
+	optiwrite(1, ".\n", 2, 1);
+}
+
 void	print_chains()
 {
 	int	i;
@@ -34,9 +49,18 @@ void	print_chains()
 
     //optiwrite(1, "\033[2J", 4, 0);
     optiwrite(1, "\33[0;0H", 6, 0);
-	optiwrite(1, "Chains except BIG:\n", 19, 0);
+    print_malloc_stats();
+    if (malloc_params()->options & MOPT_PRINT_ONLY_TINY)
+	    optiwrite(1, "Chains SMALL:\n", 19, 0);
+    else if (malloc_params()->options & MOPT_PRINT_NO_LARGE)
+	    optiwrite(1, "Chains except BIG:\n", 19, 0);
+    else
+	    optiwrite(1, "Chains:\n", 19, 0);
 	i = 0;
-    zone_max = NB_ZONES - (malloc_params()->options & MOPT_PRINT_NO_LARGE ? 1 : 0);
+    if (!(malloc_params()->options & MOPT_PRINT_ONLY_TINY))
+        zone_max = NB_ZONES - (malloc_params()->options & MOPT_PRINT_NO_LARGE ? 1 : 0);
+    else
+        zone_max = 1;
 	while (i < zone_max)
 	{
 		optiwrite(1, malloc_params()->name[i], ft_strlen(malloc_params()->name[i]), 0);
@@ -107,9 +131,6 @@ void	print_single_chain(t_chain *chain)
 	uint32_t	i;
 	t_chaincell	*cell;
 
-    //optiwrite(1, "\nnb cells:", 10, 0);
-    //print_size(chain->index);
-    //optiwrite(1, "\n", 1, 0);
 	if (!chain->index)
 		return ;
 	cell = &chain->cells[0];
@@ -211,8 +232,6 @@ t_chaincell *get_lowest_address_from_zone(size_t zone, t_chaincell *lowest)
     t_chaincell *first_cell;
     t_chaincell *minimum;
 
-//    optiwrite(1, "gaf ", 4, 0);
-//    print_address(lowest? lowest->block: 0);
     first_cell = &malloc_data()->mem_as_chain[zone]->cells[0];
     cell = first_cell;
     minimum = 0;
@@ -221,9 +240,6 @@ t_chaincell *get_lowest_address_from_zone(size_t zone, t_chaincell *lowest)
             minimum = cell;
         cell = cell->next;
     } while (cell != first_cell);
-//    optiwrite(1, "\nret ", 5, 0);
-//    print_address(minimum ? minimum->block : 0);
-//    optiwrite(1, "\n", 1, 0);
     return (minimum);
 }
 
@@ -276,12 +292,6 @@ void    show_alloc_mem()
         cell = 0;
         while ((cell = get_lowest_address_from_zone(zone, cell)))
         {
-//            print_address(cell->block);
-//            optiwrite(1, "\n FROM \n", 8, 0);
-//            print_address(cell);
-//            optiwrite(1, "\n", 1, 0);
-//            print_address(cell->next);
-//            optiwrite(1, "\n", 1, 0);
             do {
                 if (!cell->is_free)
                     print_alloc_cell(cell);
