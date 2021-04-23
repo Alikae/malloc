@@ -17,6 +17,8 @@ typedef struct  s_malloc_stats
     size_t  calloc_calls;
     size_t  free_calls;
     size_t  total_calls;
+    size_t  total_alloc_size;
+    size_t  total_free_size;
 }               t_malloc_stats;
 
 typedef struct	s_malloc

@@ -32,6 +32,45 @@ void    optiwrite(int fd, const char *s, size_t size, uint8_t flush)
         optiflush(fd, buffer, &i);
 }
 
+void    count_tiny_stats(size_t *alloc_size, size_t *free_size)
+{
+    t_chain     *mem_as_chain;
+    t_chaincell *cell;
+
+    *alloc_size = 0;
+    *free_size = 0;
+    if (!(mem_as_chain = malloc_data()->mem_as_chain[0]))
+        return ;
+	cell = &mem_as_chain->cells[0];
+	while (cell)
+	{
+        if (cell->is_free)
+            *free_size += cell->size;
+        else
+            *alloc_size += cell->size;
+		cell = cell->next;
+		if (cell == &mem_as_chain->cells[0])
+			return ;
+	}
+}
+
+void    subtract_large_stats(size_t *alloc_size)
+{
+    t_chain     *mem_as_chain;
+    t_chaincell *cell;
+
+    if (!(mem_as_chain = malloc_data()->mem_as_chain[NB_ZONES - 1]))
+        return;
+	cell = &mem_as_chain->cells[0];
+	while (cell)
+	{
+        *alloc_size -= cell->size;
+		cell = cell->next;
+		if (cell == &mem_as_chain->cells[0])
+			return ;
+	}
+}
+
 void    print_malloc_stats()
 {
 	optiwrite(1, "mallocs: ", 9, 0);
@@ -44,7 +83,29 @@ void    print_malloc_stats()
     print_size(malloc_data()->stats.free_calls);
 //	optiwrite(1, ", Total: ", 9, 0);
 //    print_size(malloc_data()->stats.total_calls);
-	optiwrite(1, ".\n", 2, 1);
+	optiwrite(1, ".\n", 2, 0);
+    size_t alloc_size;
+    size_t free_size;
+    alloc_size = malloc_data()->stats.total_alloc_size;
+    free_size = malloc_data()->stats.total_free_size;
+    if (malloc_params()->options & MOPT_ADAPT_STATS)
+    {
+        if (malloc_params()->options & MOPT_PRINT_NO_LARGE)
+        {
+            subtract_large_stats(&alloc_size);
+        }
+        else if (malloc_params()->options & MOPT_PRINT_ONLY_TINY)
+        {
+            count_tiny_stats(&alloc_size, &free_size);
+        }
+    }
+	optiwrite(1, "total alloced size: ", 20, 0);
+    print_size(alloc_size / 1000);
+	optiwrite(1, "kB, total free size: ", 21, 0);
+    print_size(free_size / 1000);
+	optiwrite(1, "kB, used mem: ", 14, 0);
+    print_size((uint8_t)(((double)alloc_size / (double)(free_size + alloc_size)) * 100.f));
+	optiwrite(1, "%.\n", 3, 1);
 }
 
 void	print_chains()

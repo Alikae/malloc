@@ -17,6 +17,7 @@ typedef enum    e_malloc_option
     MOPT_PRINT_NO_LARGE          = 64,
     MOPT_PRINT_ONLY_TINY          = 128,
     MOPT_PRINT_STEP          = 256,
+    MOPT_ADAPT_STATS          = 512,
 }               t_malloc_option;
 
 typedef enum    e_malloc_error

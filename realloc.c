@@ -5,6 +5,8 @@ t_chaincell *cut_and_merge_cell(t_chain *chain, t_chaincell *cell, size_t size)
 {
     void    *block;
 
+    malloc_data()->stats.total_alloc_size += size - cell->size;
+    malloc_data()->stats.total_free_size -= size - cell->size;
     cell->next->size -= (size - cell->size);
     cell->size = size;
     cell->next->block = cell->block + size;
@@ -70,8 +72,17 @@ void	    *ft_realloc(void *ptr, size_t size)
 	if (!cell || cell->is_free)
 	{
 		p = ft_malloc(size);
-		if (cell_found)
+		if (cell_found) // Maybe rewrite all realloc would be better...
+        {
 			ft_memcpy(p, ptr, min(size_to_copy, size));
+	        for (int zone = 0; zone < NB_ZONES; zone++)
+		        // Maybe rewrite all realloc would be better...
+		        if ((cell = find_cell_by_block(malloc_data()->mem_as_chain[zone], ptr)) && !cell->is_free)
+                {
+                    ft_free(cell->block);
+                    break;
+                }
+        }
 		return (p);
 	}
 	return (cell->block);

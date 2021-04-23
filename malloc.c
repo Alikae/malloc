@@ -102,5 +102,10 @@ void	*ft_malloc(size_t size)
 	size = align(size ? size : 1, MEM_ALIGNMENT);
 	zone = dispatch_zone(size);
 	mem = find_free_space(zone, size);
+    if (mem)
+    {
+        malloc_data()->stats.total_alloc_size += size;
+        malloc_data()->stats.total_free_size -= size;
+    }
 	return (mem);
 }

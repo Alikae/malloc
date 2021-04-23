@@ -46,7 +46,11 @@ void	ft_free(void *ptr)
             if (cell->is_free)
                 set_error(M_E_DOUBLE_FREE);
             else
+            {
+                malloc_data()->stats.total_alloc_size -= cell->size;
+                malloc_data()->stats.total_free_size += cell->size;
 	            free_and_merge_cell(chain, cell, zone);
+            }
 			return ;
         }
 	}

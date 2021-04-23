@@ -39,6 +39,8 @@ static void set_env_options()
         options |= MOPT_PRINT_ONLY_TINY;
     if (getenv("MOPT_PRINT_STEP"))
         options |= MOPT_PRINT_STEP;
+    if (getenv("MOPT_ADAPT_STATS"))
+        options |= MOPT_ADAPT_STATS;
     set_malloc_options(options);
 }
 
