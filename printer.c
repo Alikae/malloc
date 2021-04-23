@@ -16,14 +16,19 @@ void    optiflush(int fd, char buffer[4096], size_t *size)
 
 void    optiwrite(int fd, const char *s, size_t size, uint8_t flush)
 {
+    // BUFFER OVERFLOW when printing "as string" a large block (4096+...)
     static char     buffer[8192];
     static size_t   i = 0;
 
+    if (size > 1000)
+    {
+        optiflush(fd, buffer, &i);
+        write(fd, s, size);
+        return ;
+    }
     while (size--)
         buffer[i++] = *(s++);
-    if (i > 8100)
-        optiflush(fd, buffer, &i);
-    if (flush)
+    if (i > 7000 || flush)
         optiflush(fd, buffer, &i);
 }
 
@@ -51,11 +56,11 @@ void	print_chains()
     optiwrite(1, "\33[0;0H", 6, 0);
     print_malloc_stats();
     if (malloc_params()->options & MOPT_PRINT_ONLY_TINY)
-	    optiwrite(1, "Chains SMALL:\n", 19, 0);
+	    optiwrite(1, "Chains SMALL:\n", 14, 0);
     else if (malloc_params()->options & MOPT_PRINT_NO_LARGE)
 	    optiwrite(1, "Chains except BIG:\n", 19, 0);
     else
-	    optiwrite(1, "Chains:\n", 19, 0);
+	    optiwrite(1, "Chains:\n", 8, 0);
 	i = 0;
     if (!(malloc_params()->options & MOPT_PRINT_ONLY_TINY))
         zone_max = NB_ZONES - (malloc_params()->options & MOPT_PRINT_NO_LARGE ? 1 : 0);
@@ -188,7 +193,7 @@ void    print_allocated_mem_as_strings()
             } while (cell != &chain->cells[0]);
         }
     }
-    optiwrite(1, "\33[0m]\n", 7, 1);
+    optiwrite(1, "\33[0m]\n", 6, 1);
     ft_sleep();
 }
 
