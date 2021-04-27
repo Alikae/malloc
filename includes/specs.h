@@ -18,6 +18,8 @@ typedef enum    e_malloc_option
     MOPT_PRINT_ONLY_TINY          = 128,
     MOPT_PRINT_STEP          = 256,
     MOPT_ADAPT_STATS          = 512,
+    MOPT_PRINT_STATS          = 1024,
+    MOPT_LOG          = 2048,
 }               t_malloc_option;
 
 typedef enum    e_malloc_error
@@ -36,6 +38,7 @@ typedef struct	s_malloc_params
     int32_t     options;
     uint32_t    print_nth_steps;
 	size_t		page_size;
+	size_t		mallog_fd;
 }		t_malloc_params;
 
 #endif

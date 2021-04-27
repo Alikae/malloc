@@ -5,12 +5,14 @@ static void    print_data(const char *name, size_t size)
 {
     if (malloc_params()->options & MOPT_PRINT_STEP && malloc_data()->stats.total_calls % malloc_params()->print_nth_steps)
         return;
+    if (malloc_params()->options & MOPT_PRINT_STATS)
+        print_malloc_stats();
     if (malloc_params()->options & MOPT_PRINT_ALL)
         write(1, name, size);
     if (malloc_params()->options & MOPT_PRINT_AS_STRINGS)
-        print_allocated_mem_as_strings();
+        print_allocated_mem_only_strings();
     if (malloc_params()->options & MOPT_PRINT_ALLOC_MEM)
-        show_alloc_mem();
+        show_alloc_mem_intern();
     if (malloc_params()->options & MOPT_PRINT_META)
         print_chains();
 }
@@ -41,10 +43,26 @@ void	free(void *ptr)
 void	*realloc(void *ptr, size_t size)
 {
     pthread_mutex_lock(&malloc_data()->mutex);
+
+    if (malloc_params()->options & MOPT_LOG)
+    {
+        optiwrite("REALLOC: ", 9, 0);
+        print_size(size);
+        optiwrite("\n", 1, 1);
+    }
+
 	ptr = ft_realloc(ptr, size);
     malloc_data()->stats.realloc_calls += 1;
     malloc_data()->stats.total_calls += 1;
     print_data("REALLOC:\n", 9);
+
+    if (malloc_params()->options & MOPT_LOG)
+    {
+        optiwrite("RET: ", 5, 0);
+        print_size(ptr);
+        optiwrite("\n", 1, 1);
+    }
+
     pthread_mutex_unlock(&malloc_data()->mutex);
     return (ptr);
 }

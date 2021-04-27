@@ -1,4 +1,5 @@
-// OK!
+// OK! WARNING: LOG FILE
+#include <fcntl.h>
 #include "malloc.h"
 
 /*
@@ -41,6 +42,10 @@ static void set_env_options()
         options |= MOPT_PRINT_STEP;
     if (getenv("MOPT_ADAPT_STATS"))
         options |= MOPT_ADAPT_STATS;
+    if (getenv("MOPT_PRINT_STATS"))
+        options |= MOPT_PRINT_STATS;
+    if (getenv("MOPT_LOG"))
+        options |= MOPT_LOG;
     set_malloc_options(options);
 }
 
@@ -53,9 +58,25 @@ t_malloc_params	*malloc_params()
         MOPT_PRINT_ERROR
         ,
         1000,
-		0
+		0,
+        1
 	};
 	return (&params);
+}
+
+char        *create_logfile_name()
+{
+    static char name[64];
+    size_t pid = getpid();
+    ft_memcpy(name, "mallogs.", 8);
+    size_t i = 8;
+    while (pid)
+    {
+        name[i++] = 48 + pid % 10;
+        pid /= 10;
+    }
+    name[i] = 0;
+    return (&name);
 }
 
 t_malloc	*malloc_data()
@@ -64,10 +85,18 @@ t_malloc	*malloc_data()
 
 	if (!malloc.init)
 	{
+   //         optiwrite(1, "\033[2J", 4, 0);
 		malloc_params()->page_size = getpagesize();
 		malloc.init = 1;
         pthread_mutex_init(&malloc.mutex, 0);
         set_env_options();
+        if (malloc_params()->options & (MOPT_PRINT_STATS | MOPT_PRINT_META))
+            optiwrite("\033[2J", 4, 0);
+        if (malloc_params()->options & MOPT_LOG)
+        {
+            char *logfile = create_logfile_name();
+            malloc_params()->mallog_fd = open(logfile, O_CREAT | O_WRONLY);
+        }
 	}
 	return (&malloc);
 }

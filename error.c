@@ -22,9 +22,15 @@ void		*set_error(t_malloc_error error)
     if (malloc_params()->options & MOPT_PRINT_ERROR)
     {
         err = get_error();
-        write(1, "MALLOC_ERROR: ", 14);
-        write(1, err, ft_strlen(err));
-        write(1, "\n", 1);
+        write(2, "MALLOC_ERROR: ", 14);
+        write(2, err, ft_strlen(err));
+        write(2, "\n", 1);
+        if (malloc_params()->options & MOPT_LOG)
+        {
+            optiwrite("MALLOC_ERROR: ", 14, 0);
+            optiwrite(err, ft_strlen(err), 0);
+            optiwrite("\n", 1, 1);
+        }
     }
     return (0);
 }
